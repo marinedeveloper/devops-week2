@@ -1,0 +1,23 @@
+services:
+  identidock:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+        - FLASK_APP=/app/identidock.py
+        - FLASK_ENV=development
+    volumes:
+      - "./app:/app"
+    networks:
+      - identinet
+    command: flask run -h 0.0.0.0
+
+  dnmonster:
+    image: amouat/dnmonster:1.0
+    container_name: redis
+    networks:
+      - identinet
+
+networks:
+  identinet:
+    driver: bridge
