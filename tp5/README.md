@@ -55,6 +55,14 @@ Trouver la commande pour déchoir et promouvoir l’un de vos nœuds de manager 
 Promouvoir -> docker node promote
 Dechoir -> docker node demote
 
+Introduction a Kubernetes 
+
+Lister les notions équivalentes : 
+
+- Gestion des ports pour chaques services
+- Gestion des deploys avec les replicas
+- Gestion des containers et des images
+
 
 
 

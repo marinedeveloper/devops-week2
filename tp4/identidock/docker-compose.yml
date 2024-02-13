@@ -1,8 +1,11 @@
 services:
   identidock:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.identidock.rule=Host(`monster.localhost`)"
+      - "traefik.http.services.identidock.loadbalancer.server.port=5000"
+      - "traefik.docker.network=identinet"
     build: .
-    ports:
-      - "5000:5000"
     environment:
         - FLASK_APP=/app/identidock.py
         - FLASK_ENV=development
@@ -18,6 +21,23 @@ services:
     networks:
       - identinet
 
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.10
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker=true --entrypoints.web.address=:80 --providers.docker.exposedbydefault=true
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - //var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - identinet
+
 networks:
   identinet:
     driver: bridge
+
