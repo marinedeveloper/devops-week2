@@ -29,6 +29,24 @@ services:
       - -strict.perms=false
     restart: always
 
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.13.0
+    command: sh -c './metricbeat -e -strict.perms=false modules enable nginx && exec metricbeat -e -strict.perms=false'
+    user: root
+    volumes:
+      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - logging-network
+    environment:
+      - -strict.perms=false
+    depends_on:
+      kibana:
+        condition: service_started
+        restart: true
+    restart: always
+
   kibana:
     image: docker.elastic.co/kibana/kibana:7.13.0
     depends_on:
@@ -45,9 +63,9 @@ services:
     working_dir: /app
     volumes:
       - ./templates:/usr/share/nginx/html
+      - ./templates/conf.d:/etc/nginx/conf.d
     networks:
       - logging-network
-
 
 networks:
   logging-network:
